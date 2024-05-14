@@ -1,30 +1,29 @@
-trigger:
-- main
+name: Node.js CI
 
-pool:
-  vmImage: 'ubuntu-latest'
+on:
+  push:
+    branches: [ main ]
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '21.7.1'
-  displayName: 'Install Node.js'
+jobs:
+  build:
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+    runs-on: ubuntu-latest
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'build'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    replaceExistingArchive: true
+    steps:
+    - uses: actions/checkout@v2
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    artifactName: 'WebApp'
-    publishLocation: 'Container'
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '21.7.1'
+
+    - name: npm install and build
+      run: |
+        npm install
+        npm run build
+
+    - name: Archive build output
+      uses: actions/upload-artifact@v2
+      with:
+        name: webapp
+        path: build/
