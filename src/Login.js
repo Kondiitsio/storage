@@ -6,6 +6,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -16,6 +18,11 @@ export default function Login() {
       },
       body: JSON.stringify({ username, password })
     });
+
+    if (response.status === 401) {
+      setErrorMessage("Invalid credentials");
+      return;
+    }
 
     const data = await response.json();
     // console.log(data); // Uncomment to see the tokens in the console for debugging
@@ -81,6 +88,7 @@ export default function Login() {
                   />
                 </div>
               </div>
+              {errorMessage && <div className="text-red-500">{errorMessage}</div>}
               <div>
                 <button
                   type="submit"
